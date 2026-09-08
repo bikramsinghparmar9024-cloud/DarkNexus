@@ -124,14 +124,27 @@ def ocr_available() -> Tuple[bool, Optional[str]]:
     if not settings.MEDIA_OCR_ENABLED:
         return False, "OCR is disabled by configuration (MEDIA_OCR_ENABLED)."
     try:
+        # Ask the project's own locator, not pytesseract directly. The Windows
+        # installer does not add itself to PATH, so a perfectly working engine
+        # at "C:/Program Files/Tesseract-OCR" looks missing to a bare
+        # get_tesseract_version() call - which is exactly what happened here:
+        # the engine was installed and this check still reported it absent.
+        from ocr.processor import ocr_processor
+
+        if not ocr_processor.available:
+            return False, (
+                "The tesseract engine was not found. Install it "
+                "(winget install UB-Mannheim.TesseractOCR), or set "
+                "TESSERACT_CMD in backend/.env to the full path of "
+                "tesseract.exe, then restart the backend.")
+
         import pytesseract
         pytesseract.get_tesseract_version()
         return True, None
     except Exception as e:
         return False, (
-            "The tesseract engine is not installed or not on PATH, so no image "
-            "can be read. Install it (winget install UB-Mannheim.TesseractOCR) "
-            f"and restart the backend. [{type(e).__name__}]")
+            "The tesseract engine is installed but could not be run: "
+            f"{type(e).__name__}: {e}")
 
 
 def _ocr(path: str) -> str:

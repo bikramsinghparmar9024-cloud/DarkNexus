@@ -25,3 +25,7 @@ venv/
 # Docker
 .env.docker
 docker-compose.override.yml
+
+# OCR language files: 16 MB of binary model data, downloaded rather than
+# authored. backend/Dockerfile installs them via apt for containers.
+backend/tessdata/
