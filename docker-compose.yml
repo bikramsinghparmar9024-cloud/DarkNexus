@@ -1,0 +1,105 @@
+# DarkNexus — full stack.
+#
+#   docker compose up --build
+#   interface  http://localhost:8080
+#
+# Copy .env.docker.example to .env first; the backend refuses to start with
+# placeholder secrets, which is deliberate.
+#
+# Nothing but the interface is published to the host. The database, the API
+# and the Tor proxy are reachable only from inside this network, so an open
+# port on the machine cannot expose the evidence store.
+
+services:
+
+  # ── Anonymity layer ────────────────────────────────────────────────
+  tor:
+    build: ./tor
+    container_name: darknexus-tor
+    restart: unless-stopped
+    environment:
+      TOR_CONTROL_PASSWORD: ${TOR_CONTROL_PASSWORD:?set TOR_CONTROL_PASSWORD in .env}
+    networks: [darknexus]
+
+  # ── Evidence store ─────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: darknexus-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-darknexus}
+      POSTGRES_USER: ${POSTGRES_USER:-darknexus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # The backend waits for this. Without it the API starts first, fails to
+      # connect, and the stack comes up looking healthy but holding nothing.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-darknexus}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [darknexus]
+
+  # ── Collection, analysis and API ───────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      args:
+        # Set false for a ~450 MB smaller image; the surface scraper then
+        # uses plain HTTP and collects less from script-rendered pages.
+        INSTALL_BROWSER: ${INSTALL_BROWSER:-true}
+    container_name: darknexus-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      tor:
+        condition: service_started
+    environment:
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      DEBUG: "False"
+
+      POSTGRES_URL: postgresql+asyncpg://${POSTGRES_USER:-darknexus}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-darknexus}
+
+      # "tor" is the service name above. 127.0.0.1 would be this container.
+      TOR_ENABLED: "True"
+      TOR_HOST: tor
+      TOR_SOCKS_PORT: "9050"
+      TOR_CONTROL_PORT: "9051"
+      TOR_CONTROL_PASSWORD: ${TOR_CONTROL_PASSWORD}
+
+      TELEGRAM_API_ID: ${TELEGRAM_API_ID:-}
+      TELEGRAM_API_HASH: ${TELEGRAM_API_HASH:-}
+    volumes:
+      # Evidence outlives the container. Rebuilding the image must never
+      # discard collected records, downloaded media or the vector index.
+      - evidence_media:/app/evidence_media
+      - chroma_data:/app/chroma_data
+      - reports:/app/reports
+    networks: [darknexus]
+
+  # ── Interface ──────────────────────────────────────────────────────
+  frontend:
+    build: ./frontend
+    container_name: darknexus-ui
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      # The only port exposed to the host. Bound to loopback: reaching this
+      # from another machine should be a deliberate decision, made with a VPN
+      # or a reverse proxy, not the default for a narcotics database.
+      - "127.0.0.1:8080:80"
+    networks: [darknexus]
+
+volumes:
+  pgdata:
+  evidence_media:
+  chroma_data:
+  reports:
+
+networks:
+  darknexus:
+    driver: bridge

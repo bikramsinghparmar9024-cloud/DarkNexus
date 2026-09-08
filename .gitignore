@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+# Databases and every backup shape this project produces. `*.db` alone does
+# not match `drug_intel.db.pre-identity-20260908-160407`, because the suffix
+# comes AFTER the extension - five 13 MB files of collected evidence would
+# have been committed.
+*.db
+*.db.*
+*.sqlite3
+*.sqlite3.*
+chroma_data/
+evidence_media/
+reports/
+node_modules/
+dist/
+.pytest_cache/
+*.session
+*.session-journal
+.venv/
+venv/
+
+# Docker
+.env.docker
+docker-compose.override.yml

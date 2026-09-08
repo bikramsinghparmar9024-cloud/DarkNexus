@@ -1,0 +1,22 @@
+# Never copy secrets, evidence or local state into an image. An image is
+# pushed to registries and shared; a database baked into one leaks every
+# record collected on the machine that built it.
+.env
+.env.*
+!.env.example
+*.db
+*.db.*
+*.sqlite3
+*.session
+*.session-journal
+
+chroma_data/
+evidence_media/
+reports/
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+tests/

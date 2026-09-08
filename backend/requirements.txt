@@ -1,0 +1,59 @@
+# ── Core Framework ───────────────────────────────
+fastapi[standard]==0.115.*
+uvicorn[standard]==0.34.*
+pydantic==2.*
+pydantic-settings==2.*
+python-multipart==0.0.*
+
+# ── Database: PostgreSQL ─────────────────────────
+sqlalchemy[asyncio]==2.*
+asyncpg==0.30.*
+psycopg2-binary==2.9.*
+aiosqlite==0.20.*
+
+# ── Database: Neo4j ──────────────────────────────
+neo4j==5.*
+
+# ── Database: ChromaDB (Vector Store) ────────────
+chromadb==0.5.*
+
+# ── Authentication ───────────────────────────────
+python-jose[cryptography]==3.3.*
+passlib[bcrypt]==1.7.*
+bcrypt==4.*
+
+# ── Web Scraping: Surface Web ────────────────────
+playwright==1.*
+playwright-stealth==1.*
+beautifulsoup4==4.*
+lxml==5.*
+fake-useragent==2.*
+
+# ── Web Scraping: Dark Web (Tor) ─────────────────
+requests[socks]==2.*
+PySocks==1.*
+stem==1.8.*
+
+# ── Web Scraping: Telegram ───────────────────────
+telethon==1.*
+
+# ── HTTP Client ──────────────────────────────────
+httpx[socks]==0.28.*   # socks extra is required for Tor (.onion) routing
+aiohttp==3.*
+
+# ── OCR ──────────────────────────────────────────
+pytesseract==0.3.*
+Pillow==11.*
+
+# ── Blockchain ───────────────────────────────────
+web3==7.*
+
+# ── PDF Generation ───────────────────────────────
+weasyprint==63.*
+
+# ── Task Scheduling ──────────────────────────────
+apscheduler==3.*
+
+# ── Utilities ────────────────────────────────────
+python-dotenv==1.*
+loguru==0.7.*

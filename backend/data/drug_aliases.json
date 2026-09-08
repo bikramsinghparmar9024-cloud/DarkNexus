@@ -1,0 +1,41 @@
+{
+  "_comment": [
+    "Alias table mapping every spelling of a substance to one canonical name.",
+    "Edit this file to add new street vocabulary - no code change or restart is",
+    "needed beyond calling core.identity.reload_drug_aliases().",
+    "Keys are canonical names; values are the aliases that map onto them.",
+    "Matching is case- and punctuation-insensitive, so 'Heroin / Chitta' and",
+    "'heroin-chitta' both resolve without needing separate entries."
+  ],
+  "substances": {
+    "heroin": [
+      "chitta", "smack", "brown sugar", "brown", "white",
+      "heroin / chitta", "heroin/chitta", "chitta heroin", "safed",
+      "powder", "grade a", "grade-a", "no 4", "number 4"
+    ],
+    "opium": [
+      "bhukki", "afeem", "afim", "doda", "doda post", "post",
+      "poppy straw", "poppy husk", "opium / bhukki", "opium/bhukki",
+      "phukki", "bhuki"
+    ],
+    "tramadol": [
+      "ultram", "tramadol / synthetic opioids", "tramadol/synthetic opioids",
+      "synthetic opioids", "tol", "parvorin", "tramal", "100mg", "200mg"
+    ],
+    "methamphetamine": [
+      "meth", "ice", "crystal", "crystal meth", "shabu",
+      "methamphetamine / ice", "methamphetamine/ice", "glass"
+    ],
+    "mdma": ["ecstasy", "molly", "xtc", "meow meow", "meow-meow"],
+    "cocaine": ["coke", "charas safed", "snow", "blow"],
+    "cannabis": [
+      "charas", "ganja", "weed", "hashish", "hash", "bhang", "sulfa", "sulpha"
+    ],
+    "precursor chemicals": [
+      "precursor", "acetic anhydride", "ephedrine", "pseudoephedrine",
+      "ephedrine hcl"
+    ],
+    "alprazolam": ["alprax", "xanax", "zanax"],
+    "buprenorphine": ["bupre", "tidigesic", "norphin"]
+  }
+}
